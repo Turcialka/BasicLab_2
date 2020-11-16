@@ -1,5 +1,6 @@
 package com.example.basiclab;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -7,11 +8,17 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.View;
 
 import android.view.Menu;
 import android.view.MenuItem;
+
+import java.util.List;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,18 +31,14 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = findViewById(R.id.fab);
-
-
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-
+                Random random = new Random();
+                View colors = view.getRootView();
+                colors.setBackgroundColor(Color.argb(255, random.nextInt(256), random.nextInt(256), random.nextInt(256)));
             }
         });
-
-
     }
 
     @Override
@@ -48,29 +51,43 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), "Ustawienia", Snackbar.LENGTH_LONG).show();
+        String message = "";
+
+        switch(id) {
+            case R.id.action_settings:
+                NavHostFragment.findNavController(getVisibleFragment())
+                        .navigate(R.id.action_global_FirstFragment);
+                message = "Settings";
+                break;
+            case R.id.action_1:
+                NavHostFragment.findNavController(getVisibleFragment())
+                        .navigate(R.id.action_global_SecondFragment);
+                message = "Action 1";
+                break;
+            case R.id.action_2:
+                NavHostFragment.findNavController(getVisibleFragment())
+                        .navigate(R.id.action_global_ThirdFragment);
+                message = "Action 2";
+                break;
 
         }
 
-        if (id == R.id.action_add) {
-            Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), "Dodaj", Snackbar.LENGTH_LONG).show();
-
-        }
-        if (id == R.id.action_show) {
-            Snackbar.make(getWindow().getDecorView().findViewById(android.R.id.content), "Pokaż", Snackbar.LENGTH_LONG).show();
-
-        }
+        Snackbar.make(findViewById(R.id.rootLayout), message, Snackbar.LENGTH_LONG).show();
 
         return super.onOptionsItemSelected(item);
     }
 
-
-
-
-
+    public Fragment getVisibleFragment(){
+        FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
+        List<Fragment> fragments =  fragmentManager.getFragments();
+        if(fragments != null){
+            for(Fragment fragment : fragments){
+                if(fragment != null && fragment.isVisible())
+                    return fragment;
+            }
+        }
+        return null;
+    }
 }
